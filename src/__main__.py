@@ -1,52 +1,24 @@
-import math
 import numpy
-import matplotlib.pyplot as plt
+from gradient_descent import gradientDescentConstantStepSize, gradientDescentOptimalStepSize
+from graphs import plot3DFunctionAndGradientDescent
 
-""" 
-    This is the main file of the project.
-    This project is an example of the use of the gradient descent algorithm.
-    We will use the gradient descent algorithm with a constant learning rate and a optimal learning rate.
-    We will use the gradient descent algorithm to find the minimum of the function f(x,y) = x^2 + y^2 +x*y - 3*x - 2*y + 2
-"""
-
-def f(x, y):
+def f(X):
+    x = X[0]
+    y = X[1]
     return x**2 + y**2 + x*y - 3*x - 2*y + 2
 
-def df(x, y):
+
+def df(X):
+    x = X[0]
+    y = X[1]
     return numpy.array([2*x + y - 3, 2*y + x - 2])
 
-def gradient_descent_constant_learning_rate(x, y, learning_rate, iterations):
-    for i in range(iterations):
-        x = x - learning_rate * df(x, y)[0]
-        y = y - learning_rate * df(x, y)[1]
-    return x, y
 
-def gradient_descent_optimal_learning_rate(x, y, iterations):
-    for i in range(iterations):
-        learning_rate = 1/(i+1)
-        x = x - learning_rate * df(x, y)[0]
-        y = y - learning_rate * df(x, y)[1]
-    return x, y
+X = numpy.meshgrid(numpy.linspace(-10, 10, 100), numpy.linspace(-10, 10, 100))
+Z = f(X)
 
-def main():
-    x = 0
-    y = 0
-    iterations = 1000
-    learning_rate = 0.01
-    x1, y1 = gradient_descent_constant_learning_rate(x, y, learning_rate, iterations)
-    x2, y2 = gradient_descent_optimal_learning_rate(x, y, iterations)
-    print("Constant learning rate: ", x1, y1)
-    print("Optimal learning rate: ", x2, y2)
+x0 = numpy.array([8, 8])
+X_values = gradientDescentConstantStepSize(f, df, x0, 0.1, return_steps=True)
+fx_values = numpy.array([[x_value[0], x_value[1], f(x_value)] for x_value in X_values])
 
-    x = numpy.linspace(-10, 10, 100)
-    y = numpy.linspace(-10, 10, 100)
-    X, Y = numpy.meshgrid(x, y)
-    Z = f(X, Y)
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, Z)
-    plt.show()
-
-if __name__ == "__main__":
-    main()
-
+plot3DFunctionAndGradientDescent(X[0], X[1], Z, fx_values, 'f(x, y) = x^2 + y^2 + xy - 3x - 2y + 2', 'x', 'y', 'f(x, y)')
